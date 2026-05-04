@@ -49,7 +49,7 @@ export default function BookDetailPage() {
 
   return (
     <div className="page">
-      <button className="btn-back" onClick={() => navigate('/books')}>← Back</button>
+      <button className="btn-back" onClick={() => navigate(-1)}>← Back</button>
 
       <div className="card">
         <div className="card-header">
