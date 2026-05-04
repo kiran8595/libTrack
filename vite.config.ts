@@ -18,7 +18,7 @@ export default defineConfig({
         background_color: '#f8f9fa',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: '/libTrack/',
         icons: [
           {
             src: 'icon-192.png',

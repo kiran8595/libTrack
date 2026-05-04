@@ -10,6 +10,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from './db/database';
 import { isOverdue } from './db/utils';
 
+const BASE = '/libTrack/';
+
 export default function App() {
   const borrows = useLiveQuery(() => db.borrows.where('isReturned').equals(0).toArray());
   const holds = useLiveQuery(() => db.holds.where('isFulfilled').equals(0).toArray());
@@ -22,7 +24,7 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={BASE}>
       <div className="app">
         <main className="main-content">
           <Routes>
