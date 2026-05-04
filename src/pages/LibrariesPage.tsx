@@ -138,7 +138,6 @@ export default function LibrariesPage() {
 
       <div className="list">
         {libraries?.map((lib) => {
-          const libLocations = locations?.filter((l) => l.libraryId === lib.id!) || [];
           return (
             <div key={lib.id} className="card">
               <div className="card-header">
