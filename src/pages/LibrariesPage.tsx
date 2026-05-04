@@ -145,23 +145,12 @@ export default function LibrariesPage() {
                 <div>
                   <h3>{lib.name}</h3>
                   {lib.cardNumber && <span className="subtitle">Card: {lib.cardNumber}</span>}
-                  <span className="subtitle">{libLocations.length} location{libLocations.length !== 1 ? 's' : ''}</span>
                 </div>
                 <div className="card-actions">
                   <button className="btn-icon" onClick={() => handleEdit(lib)}>✏️</button>
                   <button className="btn-icon" onClick={() => handleDelete(lib.id!)}>🗑️</button>
                 </div>
               </div>
-
-              {libLocations.length > 0 && (
-                <div className="locations-list">
-                  {libLocations.map((loc) => (
-                    <div key={loc.id} className="location-item">
-                      <span>{loc.name}{loc.address ? ` — ${loc.address}` : ''}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               {(() => {
                 const libBooks = bookAvailabilities?.filter((a) => a.libraryId === lib.id) || [];
