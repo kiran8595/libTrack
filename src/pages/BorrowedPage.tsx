@@ -5,7 +5,7 @@ import { getEffectiveDueDate, getExtensionsUsed, getDaysUntilDue, isOverdue } fr
 import { cancelReminder } from '../db/notifications';
 
 export default function BorrowedPage() {
-  const borrows = useLiveQuery(() => db.borrows.where('isReturned').equals(0).toArray());
+  const borrows = useLiveQuery(() => db.borrows.filter((b) => !b.isReturned).toArray());
   const books = useLiveQuery(() => db.books.toArray());
   const libraries = useLiveQuery(() => db.libraries.toArray());
   const navigate = useNavigate();

@@ -4,7 +4,7 @@ import { db } from '../db/database';
 import { getWeeksOnHold, getDaysOnHold } from '../db/utils';
 
 export default function HoldsPage() {
-  const holds = useLiveQuery(() => db.holds.where('isFulfilled').equals(0).toArray());
+  const holds = useLiveQuery(() => db.holds.filter((h) => !h.isFulfilled).toArray());
   const books = useLiveQuery(() => db.books.toArray());
   const libraries = useLiveQuery(() => db.libraries.toArray());
   const navigate = useNavigate();

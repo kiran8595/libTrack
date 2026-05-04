@@ -59,7 +59,17 @@ export default function BookDetailPage() {
         {book.author && <p className="detail-row"><strong>Author:</strong> {book.author}</p>}
         {book.isbn && <p className="detail-row"><strong>ISBN:</strong> {book.isbn}</p>}
         {book.genre && <p className="detail-row"><strong>Genre:</strong> {book.genre}</p>}
-        <p className="detail-row"><strong>Status:</strong> <span className={`status-pill status-${book.readStatus.replace(/\s/g, '-').toLowerCase()}`}>{book.readStatus}</span></p>
+        <p className="detail-row"><strong>Status:</strong>
+          <select
+            className="inline-select"
+            value={book.readStatus}
+            onChange={(e) => db.books.update(bookId, { readStatus: e.target.value as any })}
+          >
+            <option value="Want to Read">Want to Read</option>
+            <option value="Reading">Reading</option>
+            <option value="Finished">Finished</option>
+          </select>
+        </p>
         {book.notes && <p className="detail-row"><strong>Notes:</strong> {book.notes}</p>}
       </div>
 

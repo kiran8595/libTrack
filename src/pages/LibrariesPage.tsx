@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../db/database';
 import type { Library } from '../db/database';
 
@@ -14,6 +15,9 @@ export default function LibrariesPage() {
   const [showLocationForm, setShowLocationForm] = useState<number | null>(null);
 
   const locations = useLiveQuery(() => db.locations.toArray());
+  const bookAvailabilities = useLiveQuery(() => db.bookAvailabilities.toArray());
+  const books = useLiveQuery(() => db.books.toArray());
+  const navigate = useNavigate();
 
   const resetForm = () => {
     setName('');
@@ -151,6 +155,28 @@ export default function LibrariesPage() {
               ) : (
                 <button className="btn-link" onClick={() => setShowLocationForm(lib.id!)}>+ Add Location</button>
               )}
+
+              {(() => {
+                const libBooks = bookAvailabilities?.filter((a) => a.libraryId === lib.id) || [];
+                if (libBooks.length === 0) return null;
+                return (
+                  <div className="lib-books-section">
+                    <h4 className="lib-books-title">Books ({libBooks.length})</h4>
+                    {libBooks.map((avail) => {
+                      const book = books?.find((b) => b.id === avail.bookId);
+                      if (!book) return null;
+                      return (
+                        <div key={avail.id} className="lib-book-item" onClick={() => navigate(`/books/${book.id}`)}>
+                          <span className="lib-book-title">{book.title}</span>
+                          {avail.category && <span className="lib-book-meta">📁 {avail.category}</span>}
+                          {avail.shelfRow && <span className="lib-book-meta">📍 {avail.shelfRow}</span>}
+                          {avail.callNumber && <span className="lib-book-meta"># {avail.callNumber}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

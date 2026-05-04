@@ -13,8 +13,8 @@ import { isOverdue } from './db/utils';
 const BASE = '/libTrack/';
 
 export default function App() {
-  const borrows = useLiveQuery(() => db.borrows.where('isReturned').equals(0).toArray());
-  const holds = useLiveQuery(() => db.holds.where('isFulfilled').equals(0).toArray());
+  const borrows = useLiveQuery(() => db.borrows.filter((b) => !b.isReturned).toArray());
+  const holds = useLiveQuery(() => db.holds.filter((h) => !h.isFulfilled).toArray());
 
   const overdueCount = borrows?.filter((b) => isOverdue(b)).length || 0;
   const holdsCount = holds?.length || 0;

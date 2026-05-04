@@ -7,8 +7,8 @@ import { useNavigate } from 'react-router-dom';
 
 export default function BooksPage() {
   const books = useLiveQuery(() => db.books.orderBy('title').toArray());
-  const borrows = useLiveQuery(() => db.borrows.where('isReturned').equals(0).toArray());
-  const holds = useLiveQuery(() => db.holds.where('isFulfilled').equals(0).toArray());
+  const borrows = useLiveQuery(() => db.borrows.filter((b) => !b.isReturned).toArray());
+  const holds = useLiveQuery(() => db.holds.filter((h) => !h.isFulfilled).toArray());
   const [showForm, setShowForm] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
