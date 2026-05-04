@@ -97,7 +97,7 @@ export default function BookDetailPage() {
             <button className="btn-small" onClick={() => setShowBorrowForm(true)}>Mark as Borrowed</button>
           </>
         )}
-        {showBorrowForm && <BorrowForm bookId={bookId} onClose={() => setShowBorrowForm(false)} />}
+        {showBorrowForm && <BorrowForm bookId={bookId} availabilities={availabilities || []} onClose={() => setShowBorrowForm(false)} />}
       </div>
 
       {/* Holds */}
@@ -110,7 +110,7 @@ export default function BookDetailPage() {
         {activeHolds.map((hold) => (
           <HoldCard key={hold.id} hold={hold} libraryName={getLibraryName(hold.libraryId)} onFulfill={() => handleFulfillHold(hold.id!)} />
         ))}
-        {showHoldForm && <HoldForm bookId={bookId} onClose={() => setShowHoldForm(false)} />}
+        {showHoldForm && <HoldForm bookId={bookId} availabilities={availabilities || []} onClose={() => setShowHoldForm(false)} />}
       </div>
 
       {/* Borrow History */}
@@ -209,14 +209,21 @@ function AvailabilityForm({ bookId, onClose }: { bookId: number; onClose: () => 
   );
 }
 
-function BorrowForm({ bookId, onClose }: { bookId: number; onClose: () => void }) {
+function BorrowForm({ bookId, availabilities, onClose }: { bookId: number; availabilities: any[]; onClose: () => void }) {
+  const firstAvail = availabilities[0];
   const libraries = useLiveQuery(() => db.libraries.orderBy('name').toArray());
-  const [libraryId, setLibraryId] = useState(0);
+  const [libraryId, setLibraryId] = useState(firstAvail?.libraryId || 0);
   const [borrowDate, setBorrowDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState(
     new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   );
   const [notes, setNotes] = useState('');
+
+  const handleBorrowDateChange = (value: string) => {
+    setBorrowDate(value);
+    const newDue = new Date(new Date(value).getTime() + 21 * 24 * 60 * 60 * 1000);
+    setDueDate(newDue.toISOString().split('T')[0]);
+  };
 
   const handleSave = async () => {
     if (!libraryId) return;
@@ -236,11 +243,21 @@ function BorrowForm({ bookId, onClose }: { bookId: number; onClose: () => void }
 
   return (
     <div className="inline-form">
-      <select value={libraryId} onChange={(e) => setLibraryId(Number(e.target.value))}>
-        <option value={0}>Select a library</option>
-        {libraries?.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
-      </select>
-      <label>Borrow Date <input type="date" value={borrowDate} onChange={(e) => setBorrowDate(e.target.value)} /></label>
+      {availabilities.length === 0 ? (
+        <select value={libraryId} onChange={(e) => setLibraryId(Number(e.target.value))}>
+          <option value={0}>Select a library</option>
+          {libraries?.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+        </select>
+      ) : (
+        <select value={libraryId} onChange={(e) => setLibraryId(Number(e.target.value))}>
+          {availabilities.map((a) => (
+            <option key={a.id} value={a.libraryId}>
+              {libraries?.find((l) => l.id === a.libraryId)?.name || `Library #${a.libraryId}`}
+            </option>
+          ))}
+        </select>
+      )}
+      <label>Borrow Date <input type="date" value={borrowDate} onChange={(e) => handleBorrowDateChange(e.target.value)} /></label>
       <label>Due Date <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></label>
       <input type="text" placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
       <div className="form-actions">
@@ -251,9 +268,10 @@ function BorrowForm({ bookId, onClose }: { bookId: number; onClose: () => void }
   );
 }
 
-function HoldForm({ bookId, onClose }: { bookId: number; onClose: () => void }) {
+function HoldForm({ bookId, availabilities, onClose }: { bookId: number; availabilities: any[]; onClose: () => void }) {
+  const firstAvail = availabilities[0];
   const libraries = useLiveQuery(() => db.libraries.orderBy('name').toArray());
-  const [libraryId, setLibraryId] = useState(0);
+  const [libraryId, setLibraryId] = useState(firstAvail?.libraryId || 0);
   const [holdDate, setHoldDate] = useState(new Date().toISOString().split('T')[0]);
   const [queuePosition, setQueuePosition] = useState(0);
   const [notes, setNotes] = useState('');
@@ -266,10 +284,20 @@ function HoldForm({ bookId, onClose }: { bookId: number; onClose: () => void }) 
 
   return (
     <div className="inline-form">
-      <select value={libraryId} onChange={(e) => setLibraryId(Number(e.target.value))}>
-        <option value={0}>Select a library</option>
-        {libraries?.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
-      </select>
+      {availabilities.length === 0 ? (
+        <select value={libraryId} onChange={(e) => setLibraryId(Number(e.target.value))}>
+          <option value={0}>Select a library</option>
+          {libraries?.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+        </select>
+      ) : (
+        <select value={libraryId} onChange={(e) => setLibraryId(Number(e.target.value))}>
+          {availabilities.map((a) => (
+            <option key={a.id} value={a.libraryId}>
+              {libraries?.find((l) => l.id === a.libraryId)?.name || `Library #${a.libraryId}`}
+            </option>
+          ))}
+        </select>
+      )}
       <label>Hold Placed On <input type="date" value={holdDate} onChange={(e) => setHoldDate(e.target.value)} /></label>
       <label>Queue Position <input type="number" min={0} value={queuePosition} onChange={(e) => setQueuePosition(Number(e.target.value))} /></label>
       <input type="text" placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
