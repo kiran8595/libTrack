@@ -27,8 +27,13 @@ export default function BookDetailPage() {
   const activeHolds = holds?.filter((h) => !h.isFulfilled) || [];
 
   const handleReturn = async (borrowId: number) => {
+    const borrow = await db.borrows.get(borrowId);
     await db.borrows.update(borrowId, { isReturned: true, returnDate: new Date() });
     cancelReminder(borrowId);
+    if (borrow) {
+      await db.bookAvailabilities.where('bookId').equals(borrow.bookId).and((a) => a.libraryId === borrow.libraryId).delete();
+      await db.books.update(borrow.bookId, { readStatus: 'Finished' });
+    }
   };
 
   const handleFulfillHold = async (holdId: number) => {

@@ -173,7 +173,7 @@ export default function LibrariesPage() {
                       <span className="lib-book-title">{book.title}</span>
                       <div className="lib-book-details">
                         {activeBorrow ? (
-                          <span className="lib-book-meta text-orange">Due: {new Date(activeBorrow.dueDate).toLocaleDateString()}</span>
+                          <span className="lib-book-meta text-orange">Due in {Math.ceil((new Date(activeBorrow.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days</span>
                         ) : (
                           <span className={`status-pill-sm status-${book.readStatus.replace(/\s/g, '-').toLowerCase()}`}>{book.readStatus}</span>
                         )}
